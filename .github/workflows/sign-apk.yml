@@ -1,0 +1,65 @@
+name: Signer un APK officiel
+on:
+  workflow_call:
+    secrets:
+      apk_p12:
+        required: true
+      apk_password:
+        required: true
+jobs:
+  sign:
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.ref_name == github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      # Separate runner: no project checkout, build scripts or Gradle plugins here.
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: unsigned-android
+          path: input
+      - name: Vérifier l’identité puis signer
+        env:
+          P12: ${{ secrets.apk_p12 }}
+          PASSWORD: ${{ secrets.apk_password }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          umask 077
+          case "$GITHUB_REPOSITORY" in
+            panlelapin/blackbg)
+              package=com.github.panlelapin.blackbg; alias=blackbg; label=BlackBG; suffix=-arm64-v8a
+              cert=d7f02e4701a55950eba482d631b4df25d9fd8100c21f18f99e8897f1aab2ec5e ;;
+            panlelapin/wfqa)
+              package=com.github.panlelapin.wfqa; alias=wfquickadd; label=WFQA; suffix=''
+              cert=2256cb774b68fc4f869e77e41e1036dcbb39e14807d90e90c9dd3355c689820b ;;
+            *) exit 1 ;;
+          esac
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          "$tools/aapt" dump badging input/unsigned.apk > "$RUNNER_TEMP/badging"
+          header=$(head -1 "$RUNNER_TEMP/badging")
+          [[ "$header" == "package: name='$package' versionCode="* ]]
+          grep -Fx "application-label:'$label'" "$RUNNER_TEMP/badging"
+          version=$(sed -n "1s/.*versionName='\([^']*\)'.*/\1/p" "$RUNNER_TEMP/badging")
+          [[ "$version" =~ ^[0-9]+(\.[0-9]+){1,2}$ ]]
+          if [[ "$GITHUB_EVENT_NAME" == release ]]; then
+            [[ "$TAG" =~ ^v[0-9]+(\.[0-9]+){1,2}$ ]]
+            [[ "$version" == "${TAG#v}" || "$version" == "${TAG#v}.0" ]]
+          else
+            TAG="v$version"
+          fi
+          store=$(mktemp "$RUNNER_TEMP/signing.XXXXXX")
+          trap 'rm -f "$store"' EXIT
+          printf %s "$P12" | base64 -d > "$store"
+          output="${label}-${TAG#v}${suffix}.apk"
+          "$tools/apksigner" sign --ks "$store" --ks-key-alias "$alias" --ks-pass env:PASSWORD --key-pass env:PASSWORD --out "$output" input/unsigned.apk
+          signers=$("$tools/apksigner" verify --print-certs "$output")
+          test "$(sed -nE 's/^Signer #[0-9]+ certificate SHA-256 digest: (.*)$/\1/p' <<< "$signers")" = "$cert"
+          sha256sum "$output"
+          printf 'SIGNED_APK=%s\n' "$output" >> "$GITHUB_ENV"
+      - name: Joindre à la release publiée
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" "$SIGNED_APK" --repo "$GITHUB_REPOSITORY"
