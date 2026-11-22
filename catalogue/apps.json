@@ -1,0 +1,12 @@
+{
+  "panlelapin/blackbg": {
+    "package": "com.github.panlelapin.blackbg",
+    "asset": "BlackBG-{version}-arm64-v8a.apk",
+    "cert": "d7f02e4701a55950eba482d631b4df25d9fd8100c21f18f99e8897f1aab2ec5e"
+  },
+  "panlelapin/wfqa": {
+    "package": "com.github.panlelapin.wfqa",
+    "asset": "WFQA-{version}.apk",
+    "cert": "2256cb774b68fc4f869e77e41e1036dcbb39e14807d90e90c9dd3355c689820b"
+  }
+}
