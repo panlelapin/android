@@ -1,4 +1,4 @@
-# panlelapin — applications Android
+# Pan le lapin — applications Android
 
 [Ajouter le catalogue dans F-Droid](https://panlelapin.github.io/panlelapin/fdroid/repo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A)
 
