@@ -3,7 +3,7 @@
 [Ajouter le catalogue dans F-Droid](https://panlelapin.github.io/panlelapin/fdroid/repo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A)
 
 - **BlackBG** : fond d’écran noir.
-- **WorkFlowy Quick Add** : saisie rapide hors ligne pour WorkFlowy.
+- **wfqa** : saisie rapide hors ligne pour WorkFlowy (nom sur Android : **WFQA**).
 
 Adresse : `https://panlelapin.github.io/panlelapin/fdroid/repo/`
 
