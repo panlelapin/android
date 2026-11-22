@@ -1,11 +1,11 @@
 # Pan le lapin — applications Android
 
-[Ajouter le catalogue dans F-Droid](https://panlelapin.github.io/panlelapin/fdroid/repo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A)
+[Ajouter le catalogue dans F-Droid](https://panlelapin.github.io/fdroid-repo/fdroid/repo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A)
 
 - **BlackBG** : fond d’écran noir.
 - **wfqa** : saisie rapide hors ligne pour WorkFlowy (nom sur Android : **WFQA**).
 
-Adresse : `https://panlelapin.github.io/panlelapin/fdroid/repo/`
+Adresse : `https://panlelapin.github.io/fdroid-repo/fdroid/repo/`
 
 Empreinte SHA-256 de la clé du catalogue : `363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A`.
 
