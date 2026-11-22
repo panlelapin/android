@@ -29,6 +29,12 @@ try:
     )))
     shutil.copyfile("repo/icons/icon.png", "icon.png")
     shutil.copytree(ROOT/"catalogue/metadata", "metadata")
+    # fdroidserver uses hard links for content-addressed artwork; Git checkouts
+    # turn those into independent files. Rebuild them from their originals.
+    for app in APPS.values():
+        for icon in (work/"repo"/app["package"]).glob("*/icon_*.png"):
+            if icon.with_name("icon.png").is_file():
+                icon.unlink()
     subprocess.run(["fdroid", "update"], check=True)
 finally:
     key.unlink(missing_ok=True)
@@ -42,6 +48,11 @@ if index["repo"]["address"] != ADDRESS or set(index["packages"]) != set(expected
 pins = {app["package"]:app["cert"] for app in APPS.values()}
 for pkg, versions in expected.items():
     found = index["packages"][pkg]["versions"]
+    icons = index["packages"][pkg]["metadata"]["icon"]
+    for icon in icons.values():
+        asset = repo / icon["name"].lstrip("/")
+        if hashlib.file_digest(asset.open("rb"), "sha256").hexdigest() != icon["sha256"]:
+            raise ValueError(f"Missing or incorrect icon: {pkg}")
     if sorted(found) != versions:
         raise ValueError(f"Missing or unexpected versions for {pkg}")
     for digest, v in found.items():
