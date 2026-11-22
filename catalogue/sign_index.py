@@ -3,7 +3,9 @@ import base64
 import hashlib
 import json
 import os
+import re
 import shutil
+import ssl
 import subprocess
 import sys
 from pathlib import Path
@@ -50,8 +52,8 @@ for pkg, versions in expected.items():
             raise ValueError(f"Incorrect indexed APK: {apk.name}")
 subprocess.run(["jarsigner","-verify",str(repo/"entry.jar")],check=True,stdout=subprocess.DEVNULL)
 cert = subprocess.check_output(["keytool","-printcert","-jarfile",str(repo/"entry.jar"),"-rfc"])
-der = base64.b64decode(b"".join(line for line in cert.splitlines() if not line.startswith(b"-----")))
-if hashlib.sha256(der).hexdigest().upper() != FINGERPRINT:
+certificates = re.findall(rb"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert, re.S)
+if len(certificates) != 1 or hashlib.sha256(ssl.PEM_cert_to_DER_cert(certificates[0].decode())).hexdigest().upper() != FINGERPRINT:
     raise ValueError("Unexpected catalogue signing certificate")
 if (repo/"status").is_dir():
     shutil.rmtree(repo/"status")
