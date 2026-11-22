@@ -1,15 +1,25 @@
 # Pan le lapin — applications Android
 
-[Ajouter le catalogue dans F-Droid](https://panlelapin.github.io/android/fdroid/repo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A)
+**Pan le lapin** est le dépôt F-Droid qui distribue les APK Android signés de BlackBG et de WFQA.
+
+## Ajouter le dépôt dans F-Droid
+
+Sur ton téléphone, [ouvre le lien d’ajout](https://fdroid.link/#https://panlelapin.github.io/android/fdroid/repo?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A). Si tu lis cette page sur un autre écran, scanne ce QR code avec ton téléphone, puis confirme l’ajout dans F-Droid.
+
+<a href="https://fdroid.link/#https://panlelapin.github.io/android/fdroid/repo?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A"><img src="fdroid/repo/index.png" width="265" height="265" alt="QR code pour ajouter le dépôt signé Pan le lapin dans F-Droid"></a>
+
+| Informations du dépôt | Valeur |
+|---|---|
+| Nom dans F-Droid | Pan le lapin |
+| Adresse du catalogue | `https://panlelapin.github.io/android/fdroid/repo` |
+| Empreinte de la clé de signature (SHA-256) | `363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A` |
+
+## Applications disponibles
 
 - [**BlackBG**](https://github.com/panlelapin/blackbg/releases/latest) (`com.github.panlelapin.blackbg`) : fond d’écran noir.
 - [**wfqa**](https://github.com/panlelapin/wfqa/releases/latest) (`com.github.panlelapin.wfqa`) : saisie rapide hors ligne pour WorkFlowy (nom sur Android : **WFQA**).
 
 Ces identifiants remplacent `app.blackbg` et `io.github.panlelapin.wfquickadd` : Android les installe comme de nouvelles applications. Avant de désinstaller l’ancienne WFQA, laisser sa file d’attente se vider.
-
-Adresse : `https://panlelapin.github.io/android/fdroid/repo/`
-
-Empreinte SHA-256 de la clé du catalogue : `363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A`.
 
 ## Publier depuis GitHub
 
