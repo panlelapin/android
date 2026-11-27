@@ -42,3 +42,11 @@ Run the test suite with:
 ```sh
 python3 -B -m unittest discover -s catalog -v
 ```
+
+The index-generation integration test also requires `fdroidserver==2.4.5`.
+The publishing workflow installs that version and runs the full suite.
+
+Because fdroidserver validates configured URLs as ending in `/repo`, the
+signing tools load a conventional staging URL and set the public root URL
+in memory before generating any indexes, signatures, HTML, or QR codes.
+Signed files are never rewritten afterward.

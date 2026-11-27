@@ -33,6 +33,10 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/fdroid-env"
           "$RUNNER_TEMP/fdroid-env/bin/pip" install 'fdroidserver==2.4.5'
           echo "$RUNNER_TEMP/fdroid-env/bin" >> "$GITHUB_PATH"
+      - name: Test index generation with fdroidserver
+        if: steps.collect.outputs.changed == 'true'
+        run: |
+          "$RUNNER_TEMP/fdroid-env/bin/python" -B -m unittest discover -s catalog -v
       - name: Sign and verify the index
         if: steps.collect.outputs.changed == 'true'
         env:

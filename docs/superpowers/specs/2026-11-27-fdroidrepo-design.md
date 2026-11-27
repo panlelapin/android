@@ -35,6 +35,11 @@ renaming the local workspace is out of scope.
 The user subsequently requested working directly in the existing checkout and
 renaming the local and remote default branch from `main` to `master`.
 
+The first publication exposed fdroidserver 2.4.5's `/repo` configuration
+restriction. Load a conventional staging URL, then set the actual public URL
+in the initialized fdroidserver configuration before generation. This
+compatibility adapter must not rewrite generated or signed metadata.
+
 ## Verification
 
 Test import rules, root-layout staging, address migration without a new APK,

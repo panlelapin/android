@@ -23,7 +23,7 @@ try:
     # JSON is a subset of YAML; passwords are quoted safely.
     config.write_text(json.dumps(dict(
         sdk_path=os.environ["ANDROID_HOME"], repo_keyalias="blackbg-repo", keystore=str(key),
-        keystorepass=password, keypass=password, repo_url=ADDRESS, repo_icon="icon.png",
+        keystorepass=password, keypass=password, repo_url=ADDRESS + "repo", repo_icon="icon.png",
         repo_name="Pan le lapin", repo_description="Android apps by panlelapin",
         archive_older=0, make_current_version_link=False
     )))
@@ -35,7 +35,7 @@ try:
         for icon in (work/"repo"/app["package"]).glob("*/icon_*.png"):
             if icon.with_name("icon.png").is_file():
                 icon.unlink()
-    subprocess.run(["fdroid", "update"], check=True)
+    subprocess.run([sys.executable, str(ROOT/"catalog/update_index.py"), ADDRESS], check=True)
 finally:
     key.unlink(missing_ok=True)
     config.unlink(missing_ok=True)
