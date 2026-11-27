@@ -60,16 +60,52 @@ workflow references only where the old repository name is still used.
 **Interfaces:** Existing repository secrets remain attached to the renamed
 repository; `catalog.yml` signs and deploys the migrated public repository.
 
-- [ ] Inspect both application release workflows for reusable workflow references.
-- [ ] Rename `panlelapin/android` to `panlelapin/fdroidrepo` with GitHub CLI and
+- [x] Inspect both application release workflows for reusable workflow references.
+- [x] Rename `panlelapin/android` to `panlelapin/fdroidrepo` with GitHub CLI and
   update `origin` to `https://github.com/panlelapin/fdroidrepo.git`.
-- [ ] Rename remote `main` to `master`, verify the default branch, and rename
+- [x] Rename remote `main` to `master`, verify the default branch, and rename
   the local branch and tracking configuration.
-- [ ] Update caller repository paths if required, keeping their pinned revisions.
-- [ ] Push the migration and dispatch `catalog.yml`.
-- [ ] Wait for the signing and Pages jobs; inspect logs and resolve failures
+- [x] Update caller repository paths if required, keeping their pinned revisions.
+- [x] Push the migration and dispatch `catalog.yml`.
+- [x] Wait for the signing and Pages jobs; inspect logs and resolve failures
   before claiming publication succeeded.
-- [ ] Verify live `index-v2.json` and `entry.jar`, unchanged certificate fingerprint,
+- [x] Verify live `index-v2.json` and `entry.jar`, unchanged certificate fingerprint,
   new root URL, English descriptions, QR target, and downloadable APK hashes.
-- [ ] Synchronize generated public assets locally; record verification and mark
+- [x] Synchronize generated public assets locally; record verification and mark
   these checkboxes complete.
+
+## Delivery verification
+
+- [Publication run 46008120482](https://github.com/panlelapin/fdroidrepo/actions/runs/46008120482):
+  signing/index job and Pages job succeeded.
+- Eight tests pass with fdroidserver 2.4.5 installed, including real unsigned
+  index generation using the custom root URL.
+- Independent code review found no critical, important, or minor issues before
+  publication. Integration failures subsequently received RED-to-GREEN tests.
+- OpenSSL verified the live entry JAR signature and the unchanged pinned
+  certificate; its manifest and signed index digest match the deployed index.
+- All four published APK hashes match both the signed index and local files.
+- App icons are available with correct hashes. The generated landing page and
+  QR code resolve to the new root URL with the original signing fingerprint.
+- Development paths `catalog/apps.json`, `README.md`, and
+  `.github/workflows/catalog.yml` return HTTP 404 on Pages.
+- The default branch and Pages source are `master`; the remote exposes only
+  `master`, and local tracking and `origin/HEAD` point to it.
+
+## Implementation decisions and risks
+
+- Work directly in the checkout and rename `main` to `master`, as explicitly
+  requested. All active branch references were updated; a missed reference
+  would prevent the affected workflow from running.
+- Use one public-asset allowlist for signing staging and deployment rather
+  than publishing the entire root. An omitted asset would be unavailable;
+  regression tests and live checks cover the current assets.
+- Merge two previously unpulled automated updates, preserving both newer APKs
+  and relocating their assets. Incorrect relocation could hide an app version;
+  all four versions were verified live.
+- Load a conventional staging URL, then set fdroidserver's public URL in
+  memory before generation. This avoids modifying signed files. Upstream API
+  changes could break the adapter; the dependency is pinned and a real
+  index-generation test runs in CI.
+
+No review findings were deferred.
