@@ -9,10 +9,11 @@ import sys
 import tempfile
 import urllib.request
 from pathlib import Path
+from public_repo import copy_repo
 
 ROOT = Path(__file__).resolve().parents[1]
-ADDRESS = "https://panlelapin.github.io/android/fdroid/repo"
-APPS = json.loads((ROOT / "catalogue/apps.json").read_text())
+ADDRESS = "https://panlelapin.github.io/fdroidrepo/"
+APPS = json.loads((ROOT / "catalog/apps.json").read_text())
 
 
 def candidate(app, release):
@@ -46,7 +47,7 @@ def run(*args):
 
 def collect(work, force=False):
     repo = work / "repo"
-    index = json.loads((ROOT / "fdroid/repo/index-v2.json").read_bytes())
+    index = json.loads((ROOT / "index-v2.json").read_bytes())
     expected = {pkg: dict(info["versions"]) for pkg, info in index["packages"].items()}
     added = {}
     tools = Path(os.environ["ANDROID_HOME"]) / "build-tools/36.0.0"
@@ -81,7 +82,7 @@ def collect(work, force=False):
                 code = check_manifest(app, version, run(tools/"aapt", "dump", "badging", tmp.name),
                                       run(tools/"apksigner", "verify", "--print-certs", tmp.name), highest)
                 if not repo.exists():
-                    shutil.copytree(ROOT/"fdroid/repo", repo)
+                    copy_repo(ROOT, repo)
                 dest = repo / f"{pkg}_{code}.apk"
                 if dest.exists():
                     raise FileExistsError(dest)
@@ -93,7 +94,7 @@ def collect(work, force=False):
     dirty = bool(added) or force or index["repo"]["address"] != ADDRESS
     if dirty:
         if not repo.exists():
-            shutil.copytree(ROOT/"fdroid/repo", repo)
+            copy_repo(ROOT, repo)
         (work/"expected.json").write_text(json.dumps({pkg:sorted(versions) for pkg,versions in expected.items()}))
         # Preserve a delta from the last published index.
         (work/"tmp").mkdir(exist_ok=True)
@@ -101,7 +102,7 @@ def collect(work, force=False):
     if output := os.environ.get("GITHUB_OUTPUT"):
         with open(output, "a") as f:
             print(f"changed={str(dirty).lower()}", file=f)
-    print("Index à signer" if dirty else "Catalogue déjà à jour")
+    print("Index ready for signing" if dirty else "Catalog is already up to date")
 
 
 if __name__ == "__main__":

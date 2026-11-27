@@ -1,0 +1,8 @@
+Name: BlackBG
+Summary: A black wallpaper for your home screen or lock screen
+Description: |
+  Apply a static black wallpaper using the Android wallpaper picker without
+  accessing your existing wallpapers. Choose the home screen, lock screen,
+  or both. The app does not add an icon to the launcher.
+SourceCode: https://github.com/panlelapin/blackbg
+IssueTracker: https://github.com/panlelapin/blackbg/issues

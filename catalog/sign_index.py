@@ -24,11 +24,11 @@ try:
     config.write_text(json.dumps(dict(
         sdk_path=os.environ["ANDROID_HOME"], repo_keyalias="blackbg-repo", keystore=str(key),
         keystorepass=password, keypass=password, repo_url=ADDRESS, repo_icon="icon.png",
-        repo_name="Pan le lapin", repo_description="Applications Android de panlelapin",
+        repo_name="Pan le lapin", repo_description="Android apps by panlelapin",
         archive_older=0, make_current_version_link=False
     )))
     shutil.copyfile("repo/icons/icon.png", "icon.png")
-    shutil.copytree(ROOT/"catalogue/metadata", "metadata")
+    shutil.copytree(ROOT/"catalog/metadata", "metadata")
     # fdroidserver uses hard links for content-addressed artwork; Git checkouts
     # turn those into independent files. Rebuild them from their originals.
     for app in APPS.values():
@@ -44,7 +44,7 @@ repo = work/"repo"
 index = json.loads((repo/"index-v2.json").read_bytes())
 expected = json.loads((work/"expected.json").read_bytes())
 if index["repo"]["address"] != ADDRESS or set(index["packages"]) != set(expected):
-    raise ValueError("Wrong catalogue URL or package set")
+    raise ValueError("Incorrect repository URL or package set")
 pins = {app["package"]:app["cert"] for app in APPS.values()}
 for pkg, versions in expected.items():
     found = index["packages"][pkg]["versions"]
@@ -65,7 +65,7 @@ subprocess.run(["jarsigner","-verify",str(repo/"entry.jar")],check=True,stdout=s
 cert = subprocess.check_output(["keytool","-printcert","-jarfile",str(repo/"entry.jar"),"-rfc"])
 certificates = re.findall(rb"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", cert, re.S)
 if len(certificates) != 1 or hashlib.sha256(ssl.PEM_cert_to_DER_cert(certificates[0].decode())).hexdigest().upper() != FINGERPRINT:
-    raise ValueError("Unexpected catalogue signing certificate")
+    raise ValueError("Unexpected repository signing certificate")
 if (repo/"status").is_dir():
     shutil.rmtree(repo/"status")
 if any(f.is_symlink() or f.suffix in {".p12",".jks",".keystore"} or f.name=="config.yml" for f in repo.rglob("*")):

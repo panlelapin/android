@@ -1,4 +1,4 @@
-name: Signer un APK officiel
+name: Sign an official APK
 on:
   workflow_call:
     secrets:
@@ -18,7 +18,7 @@ jobs:
         with:
           name: unsigned-android
           path: input
-      - name: Vérifier l’identité puis signer
+      - name: Verify APK identity and sign
         env:
           P12: ${{ secrets.apk_p12 }}
           PASSWORD: ${{ secrets.apk_password }}
@@ -57,7 +57,7 @@ jobs:
           test "$(sed -nE 's/^Signer #[0-9]+ certificate SHA-256 digest: (.*)$/\1/p' <<< "$signers")" = "$cert"
           sha256sum "$output"
           printf 'SIGNED_APK=%s\n' "$output" >> "$GITHUB_ENV"
-      - name: Joindre à la release publiée
+      - name: Attach the APK to the published release
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}

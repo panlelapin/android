@@ -1,30 +1,44 @@
-# Pan le lapin — applications Android
+# Pan le lapin — Android apps
 
-**Pan le lapin** est le dépôt F-Droid qui distribue les APK Android signés de BlackBG et de WFQA.
+**Pan le lapin** is an F-Droid repository distributing signed Android APKs for BlackBG and WFQA.
 
-## Ajouter le dépôt dans F-Droid
+## Add the repository to F-Droid
 
-Sur ton téléphone, [ouvre le lien d’ajout](https://fdroid.link/#https://panlelapin.github.io/android/fdroid/repo?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A). Si tu lis cette page sur un autre écran, scanne ce QR code avec ton téléphone, puis confirme l’ajout dans F-Droid.
+On your phone, [open the repository link](https://fdroid.link/#https://panlelapin.github.io/fdroidrepo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A) and confirm the addition in F-Droid. If you are viewing this page on another device, scan the QR code with your phone.
 
-<a href="https://fdroid.link/#https://panlelapin.github.io/android/fdroid/repo?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A"><img src="fdroid/repo/index.png" width="265" height="265" alt="QR code pour ajouter le dépôt signé Pan le lapin dans F-Droid"></a>
+<a href="https://fdroid.link/#https://panlelapin.github.io/fdroidrepo/?fingerprint=363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A"><img src="index.png" width="265" height="265" alt="QR code to add the signed Pan le lapin repository to F-Droid"></a>
 
-| Informations du dépôt | Valeur |
+| Repository information | Value |
 |---|---|
-| Nom dans F-Droid | Pan le lapin |
-| Adresse du catalogue | `https://panlelapin.github.io/android/fdroid/repo` |
-| Empreinte de la clé de signature (SHA-256) | `363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A` |
+| Name in F-Droid | Pan le lapin |
+| Repository URL | `https://panlelapin.github.io/fdroidrepo/` |
+| Signing key fingerprint (SHA-256) | `363DEB527CD0C41ABBC30359005EE6F2A5A6869716D32CF42CEED66DCC3A7A7A` |
 
-## Applications disponibles
+Source repository: [panlelapin/fdroidrepo](https://github.com/panlelapin/fdroidrepo). The default branch is `master`.
 
-- [**BlackBG**](https://github.com/panlelapin/blackbg/releases/latest) (`com.github.panlelapin.blackbg`) : fond d’écran noir.
-- [**wfqa**](https://github.com/panlelapin/wfqa/releases/latest) (`com.github.panlelapin.wfqa`) : saisie rapide hors ligne pour WorkFlowy (nom sur Android : **WFQA**).
+If you added the repository before this migration, add the URL above. The previous GitHub Pages address may no longer work. The repository signing key has not changed.
 
-Ces identifiants remplacent `app.blackbg` et `io.github.panlelapin.wfquickadd` : Android les installe comme de nouvelles applications. Avant de désinstaller l’ancienne WFQA, laisser sa file d’attente se vider.
+## Available apps
 
-## Publier depuis GitHub
+- [**BlackBG**](https://github.com/panlelapin/blackbg/releases/latest) (`com.github.panlelapin.blackbg`): a static black wallpaper.
+- [**WFQA**](https://github.com/panlelapin/wfqa/releases/latest) (`com.github.panlelapin.wfqa`): offline quick capture for WorkFlowy.
 
-Dans le dépôt de l’application, augmenter sa version et son `versionCode`, puis publier une release stable avec un tag `v<version>`. L’action de l’application construit et signe l’APK avant de le joindre à la release. Le job de signature est isolé du build.
+These package identifiers replace `app.blackbg` and `io.github.panlelapin.wfquickadd`. Android treats them as new apps. Before uninstalling the older WFQA app, allow it to finish sending all queued entries.
 
-Le workflow [Mettre à jour Pan le lapin](../../actions/workflows/catalogue.yml) recherche les nouveaux APK toutes les 15 minutes (GitHub peut retarder l’exécution). Une release dont l’APK n’est pas encore prêt est reprise au passage suivant. Pour publier immédiatement après la signature, ouvrir ce workflow et choisir **Run workflow**. Le contrôle manuel reconstruit également l’index pour vérifier la clé de signature.
+## Publish an update
 
-Les sources autorisées, packages, noms d’assets et empreintes de signature sont dans `catalogue/apps.json`. Un APK déjà indexé est ignoré ; un autre APK réutilisant un `versionCode` est refusé. Les secrets Actions de ce dépôt ne contiennent que la clé d’index et son mot de passe. Les deux dépôts d’applications conservent chacun leurs propres secrets de signature. Aucun jeton personnel partagé n’est nécessaire.
+In the app's repository, increment its version and `versionCode`, then publish a stable release tagged `v<version>`. The app's workflow builds and signs the APK before attaching it to the release. Signing runs in a separate job, isolated from the build.
+
+The [Update the Pan le lapin repository](https://github.com/panlelapin/fdroidrepo/actions/workflows/catalog.yml) workflow checks for new APKs every 15 minutes; GitHub may delay scheduled runs. If a release's signed APK is not ready, the workflow checks again on the next run. To publish immediately after signing, open the workflow and select **Run workflow**. Manual runs also regenerate the index and verify its signing certificate.
+
+Allowed source repositories, package identifiers, asset names, and APK signing fingerprints are defined in `catalog/apps.json`. Already indexed APKs are skipped. A different APK reusing an existing `versionCode` is rejected. This repository's Actions secrets contain only the index signing key and its password. Each app repository retains its own APK signing secrets; no shared personal access token is required.
+
+## Repository layout and tests
+
+Public F-Droid assets are stored at the repository root. Import, signing, and staging tools, tests, and app descriptions are maintained in `catalog/`. GitHub Pages receives only public assets, not the source tooling.
+
+Run the test suite with:
+
+```sh
+python3 -B -m unittest discover -s catalog -v
+```

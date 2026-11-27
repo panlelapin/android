@@ -1,4 +1,4 @@
-name: Mettre à jour Pan le lapin
+name: Update the Pan le lapin repository
 on:
   schedule:
     - cron: '7,22,37,52 * * * *'
@@ -17,40 +17,41 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: main
-      - run: python3 -B -m unittest discover -s catalogue
-      - name: Récupérer les APK signés manquants
+          ref: master
+      - run: python3 -B -m unittest discover -s catalog
+      - name: Collect new signed APKs
         id: collect
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           extra=()
           if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then extra+=(--force); fi
-          python3 -B catalogue/importer.py "$RUNNER_TEMP/fdroid" "${extra[@]}"
-      - name: Installer fdroidserver
+          python3 -B catalog/importer.py "$RUNNER_TEMP/fdroid" "${extra[@]}"
+      - name: Install fdroidserver
         if: steps.collect.outputs.changed == 'true'
         run: |
           python3 -m venv "$RUNNER_TEMP/fdroid-env"
           "$RUNNER_TEMP/fdroid-env/bin/pip" install 'fdroidserver==2.4.5'
           echo "$RUNNER_TEMP/fdroid-env/bin" >> "$GITHUB_PATH"
-      - name: Signer et vérifier l’index
+      - name: Sign and verify the index
         if: steps.collect.outputs.changed == 'true'
         env:
           INDEX_P12: ${{ secrets.FDROID_INDEX_P12_B64 }}
           INDEX_PASSWORD: ${{ secrets.FDROID_INDEX_PASSWORD }}
         run: |
           export PATH="$ANDROID_HOME/build-tools/36.0.0:$PATH"
-          python -B catalogue/sign_index.py "$RUNNER_TEMP/fdroid"
-      - name: Enregistrer les seuls fichiers publics
+          python -B catalog/sign_index.py "$RUNNER_TEMP/fdroid"
+      - name: Commit and stage public repository assets
         if: steps.collect.outputs.changed == 'true'
         run: |
-          rsync -r --delete "$RUNNER_TEMP/fdroid/repo/" fdroid/repo/
-          git add fdroid/repo
-          git -c user.name=github-actions[bot] -c user.email=41898282+github-actions[bot]@users.noreply.github.com commit -m 'Actualiser le catalogue signé'
-          git push origin HEAD:main
-          mkdir -p "$RUNNER_TEMP/site/fdroid"
-          cp index.html "$RUNNER_TEMP/site/"
-          cp -r fdroid/repo "$RUNNER_TEMP/site/fdroid/"
+          python3 -B catalog/public_repo.py "$RUNNER_TEMP/fdroid/repo" . --replace
+          python3 -B catalog/public_repo.py . "$RUNNER_TEMP/site"
+          git add -u
+          python3 -B -c 'from pathlib import Path; import sys, subprocess; sys.path.insert(0, "catalog"); from public_repo import public_paths; subprocess.run(["git", "add", "--", *(str(p) for p in public_paths(Path(".")))], check=True)'
+          if ! git diff --cached --quiet; then
+            git -c user.name=github-actions[bot] -c user.email=41898282+github-actions[bot]@users.noreply.github.com commit -m 'Update the signed repository'
+            git push origin HEAD:master
+          fi
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         if: steps.collect.outputs.changed == 'true'
         with:
@@ -66,6 +67,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Déployer le site F-Droid
+      - name: Deploy the F-Droid repository
         id: deploy
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
