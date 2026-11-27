@@ -8,7 +8,7 @@ from pathlib import Path
 PACKAGES = {app["package"] for app in
             json.loads((Path(__file__).parent / "apps.json").read_text()).values()}
 PUBLIC_NAMES = {
-    ".nojekyll", "index.html", "index.css", "index.png", "index.xml",
+    "index.html", "index.css", "index.png", "index.xml",
     "index.jar", "index-v1.jar", "index-v1.json", "index-v2.json",
     "entry.jar", "entry.json", "icons", "diff",
 } | PACKAGES

@@ -54,6 +54,8 @@ class RepositoryMigration(unittest.TestCase):
         (root / ".github").mkdir()
         (root / "README.md").write_text("Development documentation")
         (root / "config.yml").write_text("private configuration")
+        # This Pages-only marker must not be scanned as a repository download.
+        (root / ".nojekyll").touch()
 
     def collect(self, root, work, force=False):
         with patch.object(importer, "ROOT", root), \
